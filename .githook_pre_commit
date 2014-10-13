@@ -1,0 +1,19 @@
+#!/bin/sh
+
+bail=0
+for changedfile in `git diff --name-only HEAD`; do 
+    grep --exclude TODO.md --exclude .githook_pre_commit \
+         --color=never -rhH "TODO" "$changedfile"; 
+    if [ $? -eq 0 ]; then
+        bail=1;
+    fi
+done
+
+if [ $bail -eq 1 ]; then
+    cat <<MESSAGE
+ I'm sorry; you may not commit files with TODO items inline. Instead,
+ collect the comments above into a file TODO.md, and add that to your 
+ commit. Or you may add (-n|--no-verify) to your commit line to force.
+MESSAGE
+    exit $bail;
+fi
